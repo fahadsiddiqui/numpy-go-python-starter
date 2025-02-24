@@ -1,7 +1,15 @@
 # Numpy - Go/Python Starter Kit
 
-Example project for Go-side writer and Python-side reader for 
+Example project for Go-side writer and Python-side reader for
 Numpy's .npz file formats.
+
+## Prerequisites
+
+Make sure to run
+
+```bash
+./setup.sh
+```
 
 ## Go-side writer
 
