@@ -1,7 +1,7 @@
 # Numpy - Go/Python Starter Kit
 
 Example project for Go-side writer and Python-side reader for
-Numpy's .npz file formats.
+Numpy's `.npz` file format.
 
 ## Prerequisites
 
