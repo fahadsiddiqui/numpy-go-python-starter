@@ -179,7 +179,7 @@ func connectToDB() (*sql.DB, error) {
 }
 
 // fetchMetadata fetches the schema details (tables, columns, primary keys, and foreign keys).
-func fetchMetadata(db *sql.DB) (SchemaDetails, error) {
+func fetchMetadata(db *sql.DB, dbName string) (SchemaDetails, error) {
 	var schema SchemaDetails
 
 	// Query to get all user tables in the public schema.
@@ -195,11 +195,13 @@ func fetchMetadata(db *sql.DB) (SchemaDetails, error) {
 	}
 	defer rows.Close()
 
+	tableNames := []string{}
 	for rows.Next() {
 		var tableName string
 		if err := rows.Scan(&tableName); err != nil {
 			return schema, fmt.Errorf("scanning table name: %w", err)
 		}
+		tableNames = append(tableNames, tableName)
 
 		// Create a new TableMetadata for the current table.
 		tableMeta := TableMetadata{TableName: tableName}
@@ -314,6 +316,15 @@ func fetchMetadata(db *sql.DB) (SchemaDetails, error) {
 
 	if err := rows.Err(); err != nil {
 		return schema, fmt.Errorf("processing tables: %w", err)
+	}
+
+	schema.DatasetMetadata = DatasetMetadata{
+		DatasetName: dbName,
+		SourceType:  "Relational Database",
+		SourceDetails: map[string]interface{}{
+			"database_type":         "PostgreSQL",
+			"tables_or_collections": tableNames,
+		},
 	}
 
 	return schema, nil

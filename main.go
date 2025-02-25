@@ -18,6 +18,8 @@ func saveMetadata(metadata SchemaDetails) {
 		log.Fatalf("failed to marshal metadata: %v", err)
 	}
 
+	// TODO: add header to metadata file
+
 	err = saveFile("metadata.json", b)
 	if err != nil {
 		log.Fatalf("failed to save metadata: %v", err)
@@ -31,7 +33,7 @@ func main() {
 	}
 	defer db.Close()
 
-	metadata, err := fetchMetadata(db)
+	metadata, err := fetchMetadata(db, "centrum_db_dev")
 	if err != nil {
 		log.Fatalf("failed to build metadata: %v", err)
 	}
