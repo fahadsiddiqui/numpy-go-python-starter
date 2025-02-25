@@ -161,7 +161,7 @@ type DatasetMetadata struct {
 
 type SchemaDetails struct {
 	DatasetMetadata DatasetMetadata `json:"dataset_metadata"`
-	Tables          []TableMetadata `json:"tables"`
+	Tables          []TableMetadata `json:"schema"`
 }
 
 // connectToDB connects to the PostgreSQL database.
