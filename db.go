@@ -179,7 +179,7 @@ func connectToDB() (*sql.DB, error) {
 }
 
 // fetchMetadata fetches the schema details (tables, columns, primary keys, and foreign keys).
-func fetchMetadata(db *sql.DB, dbName string) (SchemaDetails, error) {
+func fetchMetadata(db *sql.DB, dbName string, tableNames []string) (SchemaDetails, error) {
 	var schema SchemaDetails
 
 	// Query to get all user tables in the public schema.
@@ -195,13 +195,23 @@ func fetchMetadata(db *sql.DB, dbName string) (SchemaDetails, error) {
 	}
 	defer rows.Close()
 
-	tableNames := []string{}
 	for rows.Next() {
 		var tableName string
 		if err := rows.Scan(&tableName); err != nil {
 			return schema, fmt.Errorf("scanning table name: %w", err)
 		}
-		tableNames = append(tableNames, tableName)
+
+		tableNotAskedFor := true
+		for _, t := range tableNames {
+			if t == tableName {
+				tableNotAskedFor = false
+				break
+			}
+		}
+
+		if tableNotAskedFor {
+			continue
+		}
 
 		// Create a new TableMetadata for the current table.
 		tableMeta := TableMetadata{TableName: tableName}
@@ -316,6 +326,28 @@ func fetchMetadata(db *sql.DB, dbName string) (SchemaDetails, error) {
 
 	if err := rows.Err(); err != nil {
 		return schema, fmt.Errorf("processing tables: %w", err)
+	}
+
+	for tableIdx, table := range schema.Tables {
+		for fieldIdx, field := range table.Fields {
+			if field.IsForeignKey && field.ReferencedTable != nil {
+				found := false
+				// Check if the referenced table is among the selected tables.
+				for _, tableName := range tableNames {
+					if *field.ReferencedTable == tableName {
+						found = true
+						break
+					}
+				}
+
+				// If not found, update the field metadata.
+				if !found {
+					schema.Tables[tableIdx].Fields[fieldIdx].ReferencedTable = nil
+					schema.Tables[tableIdx].Fields[fieldIdx].IsForeignKey = false
+					schema.Tables[tableIdx].Fields[fieldIdx].ReferencedField = nil
+				}
+			}
+		}
 	}
 
 	schema.DatasetMetadata = DatasetMetadata{

@@ -33,7 +33,8 @@ func main() {
 	}
 	defer db.Close()
 
-	metadata, err := fetchMetadata(db, "centrum_db_dev")
+	selectedTables := []string{"users", "user_sessions", "tools"}
+	metadata, err := fetchMetadata(db, "centrum_db_dev", selectedTables)
 	if err != nil {
 		log.Fatalf("failed to build metadata: %v", err)
 	}
@@ -41,6 +42,18 @@ func main() {
 	saveMetadata(metadata)
 
 	for _, table := range metadata.Tables {
+		tableNotAskedFor := true
+		for _, t := range selectedTables {
+			if t == table.TableName {
+				tableNotAskedFor = false
+				break
+			}
+		}
+
+		if tableNotAskedFor {
+			continue
+		}
+
 		tableData, err := FetchTableData(db, table)
 		if err != nil {
 			log.Fatalf("failed to fetch table data: %v", err)
