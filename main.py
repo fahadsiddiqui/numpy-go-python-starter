@@ -1,10 +1,33 @@
 import os
 import numpy as np
 import pandas as pd
+import shutil
 
 # List of table names that have NPY files in separate directories
 table_names = [
-    "corporation_filings",
+    "actions",
+    "agent_key_values",
+    "agents",
+    "api_keys",
+    "execution_plans",
+    "memory",
+    "memory_document",
+    "notifications",
+    "prompts",
+    "saga_events",
+    "sagas",
+    "schemas",
+    "tool_configurations",
+    "toolboxes",
+    "tools",
+    "tools_to_agents",
+    "tools_to_schemas",
+    "triggers",
+    "user_sessions",
+    "users",
+    "world_model",
+    "world_model_canvas_relations",
+    "world_model_data_source_configuration",
 ]
 
 base_folder = "data"
@@ -84,6 +107,5 @@ for file_name in npz_files:
     # Display the first few rows and the data types
     print(df.head())
     print("\nData Types:")
-    print(df.count())
-    print("Count of rows:", len(df))
+    print(df.dtypes)
     print("=" * 50)

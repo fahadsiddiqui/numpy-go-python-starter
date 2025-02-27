@@ -236,7 +236,7 @@ type SchemaDetails struct {
 
 // connectToDB remains the same
 func connectToDB() (*sql.DB, error) {
-	dsn := "user=postgres dbname=testdb password=postgres host=localhost sslmode=disable"
+	dsn := "user=postgres dbname=centrum_db_dev password=postgres host=localhost sslmode=disable"
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return nil, err
@@ -666,10 +666,10 @@ func main() {
 	defer db.Close()
 
 	// Define which tables to export
-	selectedTables := []string{"corporation_filings"}
+	selectedTables := []string{"users", "user_sessions", "tools"}
 
 	// Fetch metadata about the tables
-	metadata, err := fetchMetadata(db, "testdb", selectedTables)
+	metadata, err := fetchMetadata(db, "centrum_db_dev", selectedTables)
 	if err != nil {
 		log.Fatalf("failed to build metadata: %v", err)
 	}
